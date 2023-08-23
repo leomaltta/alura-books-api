@@ -1,20 +1,29 @@
 async function searchAdress(cep) {
+    const msgErro = document.querySelector('#erro');
+    msgErro.innerHTML = "";
     try {
     var consultaCEP = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
     var consultaCEPConverted = await consultaCEP.json();
     if (consultaCEPConverted.erro) {
         throw Error('CEP inexistente');
     }
+    const cidade = document.querySelector('#cidade');
+    const logradouro = document.querySelector('#endereco')
+    const estado = document.querySelector('#estado')
+    
+    cidade.value = consultaCEPConverted.localidade;
+    logradouro.value = consultaCEPConverted.logradouro;
+    estado.value = consultaCEPConverted.uf;
+    
     console.log(consultaCEPConverted);
     return consultaCEPConverted;
 
     } catch (erro) {
+        msgErro.innerHTML = `<p>CEP Inválido. Tente novamente!</p>`
         console.log(erro);
     }
 
 }
 
-
-let ceps = ['01001000','01001000' ];
-let conjuntoCeps = ceps.map(values => searchAdress(values))
-Promise.all(conjuntoCeps).then(response => console.log(response))
+const cep = document.querySelector('#cep');
+cep.addEventListener('focusout', () => searchAdress(cep.value))
